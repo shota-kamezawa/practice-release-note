@@ -25,7 +25,7 @@ jobs:
 
       - id: release-tag
         name: Get the release tag with the commit hash
-        run: |
+        run: >
           git tag --points-at="${GITHUB_SHA}" --sort=-refname |
           grep -E "${RELEASE_TAG_NAME_PATTERN}" |
           head -n 1 |
