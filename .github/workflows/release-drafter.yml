@@ -1,7 +1,7 @@
 name: Release Drafter
 
 concurrency:
-  group: ${{ github.action }}
+  group: ${{ github.workflow }}
   cancel-in-progress: true
 
 on:
