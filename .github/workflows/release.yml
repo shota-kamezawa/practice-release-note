@@ -23,28 +23,18 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - run: echo $(git tag --points-at="${GITHUB_SHA}" --sort=-refname)
+      - id: release-tag
+        name: Get the release tag with the commit hash
+        run: >
+          git tag --points-at="${GITHUB_SHA}" --sort=-refname |
+          grep -E "${RELEASE_TAG_NAME_PATTERN}" |
+          head -n 1 |
+          awk '{print "value="$1}' >> $GITHUB_OUTPUT
 
-      - run: echo $(echo "v0.1.0" | grep -E "${RELEASE_TAG_NAME_PATTERN}")
-
-      - run: echo $(echo "v0.1.0" | grep -E "${RELEASE_TAG_NAME_PATTERN}")
-
-      - run: echo $(echo "v0.1.0" | head -n 1)
-
-      - run: echo "v0.1.0" | awk '{print "value="$1}' >> $GITHUB_OUTPUT
-
-      # - id: release-tag
-      #   name: Get the release tag with the commit hash
-      #   run: >
-      #     git tag --points-at="${GITHUB_SHA}" --sort=-refname |
-      #     grep -E "${RELEASE_TAG_NAME_PATTERN}" |
-      #     head -n 1 |
-      #     awk '{print "value="$1}' >> $GITHUB_OUTPUT
-
-      # - name: Mark the release as "Latest"
-      #   run: gh release edit "${RELEASE_TAG}" --draft=false --prerelease=false --latest=true
-      #   env:
-      #     RELEASE_TAG: ${{ steps.release-tag.outputs.value }}
+      - name: Mark the release as "Latest"
+        run: gh release edit "${RELEASE_TAG}" --draft=false --prerelease=false --latest=true
+        env:
+          RELEASE_TAG: ${{ steps.release-tag.outputs.value }}
 
   deploy:
     needs: []
