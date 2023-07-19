@@ -15,7 +15,10 @@ defaults:
 
 jobs:
   create-prerelease:
-    permissions: write-all
+    permissions:
+      contents: write
+      packages: write
+      pull-requests: read
     runs-on: ubuntu-latest
     steps:
       - uses: release-drafter/release-drafter@v5
