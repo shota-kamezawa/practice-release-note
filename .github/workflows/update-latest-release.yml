@@ -1,11 +1,11 @@
-name: Release to production
+name: Update latest release
 
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
 
 on:
-  workflow_dispatch:
+  deployment_status
 
 defaults:
   run:
@@ -15,8 +15,10 @@ env:
   RELEASE_TAG_NAME_PATTERN: '^v'
 
 jobs:
-  sync-latest-release:
-    needs: []
+  update-latest-release:
+    if: >
+      github.event.deployment_status.environment == 'production' &&
+      github.event.deployment_status.state == 'success'
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -38,10 +40,3 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ steps.release-tag.outputs.value }}
-
-  deploy:
-    needs: []
-    environment: production
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
