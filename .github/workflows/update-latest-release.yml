@@ -1,11 +1,11 @@
-name: Release to production
+name: Update latest release
 
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
 
 on:
-  workflow_dispatch:
+  deployment
 
 defaults:
   run:
@@ -15,8 +15,8 @@ env:
   RELEASE_TAG_NAME_PATTERN: '^v'
 
 jobs:
-  sync-latest-release:
-    needs: []
+  update-latest-release:
+    if: github.event.deployment.environment == 'production'
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -25,23 +25,14 @@ jobs:
 
       - run: git fetch --tags --force
 
-      - id: release-tag
-        name: Find out the release tag with the commit hash
+      - name: Find out the release tag with the commit hash
         run: >
           git tag --points-at="${GITHUB_SHA}" --sort=-refname |
           grep -E "${RELEASE_TAG_NAME_PATTERN}" |
           head -n 1 |
-          awk '{print "value="$1}' >> $GITHUB_OUTPUT
+          echo "RELEASE_TAG=$(cat)" >> $GITHUB_ENV
 
       - name: Mark the release as "Latest"
         run: gh release edit "${RELEASE_TAG}" --prerelease=false --latest
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ steps.release-tag.outputs.value }}
-
-  deploy:
-    needs: []
-    environment: production
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3

@@ -1,4 +1,4 @@
-name: Release Drafter
+name: Create prerelease
 
 concurrency:
   group: ${{ github.workflow }}
@@ -14,7 +14,7 @@ defaults:
     shell: bash
 
 jobs:
-  create-release:
+  create-prerelease:
     permissions:
       contents: write
       pull-requests: read
