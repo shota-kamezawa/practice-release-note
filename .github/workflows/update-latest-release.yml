@@ -5,7 +5,7 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  deployment
+  deployment_status
 
 defaults:
   run:
@@ -16,7 +16,9 @@ env:
 
 jobs:
   update-latest-release:
-    if: github.event.deployment.environment == 'production'
+    if: >
+      github.event.deployment_status.environment == 'production' &&
+      github.event.deployment_status.state == 'success'
     permissions:
       contents: write
     runs-on: ubuntu-latest
